@@ -8,6 +8,10 @@ import flixel.math.FlxPoint;
 import funkin.editors.ui.UIContextMenu.UIContextMenuOption;
 import funkin.game.Character;
 
+#if sys
+import sys.FileSystem;
+#end
+
 class CharacterEditor extends UIState {
 	static var __character:String;
 	public var character:Character;
