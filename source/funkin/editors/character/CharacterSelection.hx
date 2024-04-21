@@ -37,6 +37,7 @@ class CharacterSelection extends EditorTreeMenu
 		DiscordUtil.call("onEditorTreeLoaded", ["Character Editor"]);
 
 		addVirtualPad('UP_DOWN', 'A_B');
+		addVirtualPadCamera(false);
 	}
 
 	override function createPost() {
