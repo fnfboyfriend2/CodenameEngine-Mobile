@@ -263,6 +263,9 @@ class CharacterEditor extends UIState {
 		}
 
 		DiscordUtil.call("onEditorLoaded", ["Character Editor", __character]);
+
+		addVirtualPad('FULL', '');
+		addVirtualPadCamera(false);
 	}
 
 	override function destroy() {
