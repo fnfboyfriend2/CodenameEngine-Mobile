@@ -1336,15 +1336,25 @@ class Charter extends UIState {
 	}
 
 	function _file_saveas_fnflegacy(_) {
-		openSubState(new SaveSubstate(Json.stringify(FNFLegacyParser.encode(PlayState.SONG), null, Options.editorPrettyPrint ? "\t" : null), {
-			defaultSaveFile: '${__song.toLowerCase().replace(" ", "-")}${__diff.toLowerCase() == "normal" ? "" : '-${__diff.toLowerCase()}'}.json',
-		}));
+		if (!FileSystem.exists('saves'))
+			FileSystem.createDirectory('saves');
+		CoolUtil.safeSaveFile(
+			'saves/${__song.toLowerCase().replace(" ", "-")}${__diff.toLowerCase() == "normal" ? "" : '-${__diff.toLowerCase()}'}.json',
+			Json.stringify(FNFLegacyParser.encode(PlayState.SONG), null, Options.editorPrettyPrint ? "\t" : null)
+		);
+		undos.save();
+		NativeAPI.showMessageBox("Success!", "Successfully saved file.", MSG_INFORMATION);
 	}
 	
 	function _file_saveas_psych(_) {
-		openSubState(new SaveSubstate(Json.stringify(PsychParser.encode(PlayState.SONG), null, Options.editorPrettyPrint ? "\t" : null), {
-			defaultSaveFile: '${__song.toLowerCase().replace(" ", "-")}${__diff.toLowerCase() == "normal" ? "" : '-${__diff.toLowerCase()}'}.json',
-		}));
+		if (!FileSystem.exists('saves'))
+			FileSystem.createDirectory('saves');
+		CoolUtil.safeSaveFile(
+			'saves/${__song.toLowerCase().replace(" ", "-")}${__diff.toLowerCase() == "normal" ? "" : '-${__diff.toLowerCase()}'}.json',
+			Json.stringify(PsychParser.encode(PlayState.SONG), null, Options.editorPrettyPrint ? "\t" : null)
+		);
+		undos.save();
+		NativeAPI.showMessageBox("Success!", "Successfully saved file.", MSG_INFORMATION);
 	}
 
 	function _file_events_save(_) {
