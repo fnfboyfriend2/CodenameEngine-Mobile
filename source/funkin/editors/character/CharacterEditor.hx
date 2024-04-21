@@ -331,10 +331,11 @@ class CharacterEditor extends UIState {
 	function _file_save(_) {
 		#if sys
 		CoolUtil.safeSaveFile(
-			'${Paths.getAssetsRoot()}/data/characters/${character.curCharacter}.xml',
+			'data/characters/${character.curCharacter}.xml',
 			buildCharacter()
 		);
 		undos.save();
+		NativeAPI.showMessageBox("Success!", "Successfully saved file.", MSG_INFORMATION);
 		#else
 		_file_saveas(_);
 		#end
