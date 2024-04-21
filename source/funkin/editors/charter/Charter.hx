@@ -26,6 +26,10 @@ import flixel.util.FlxColor;
 import openfl.display.BitmapData;
 import funkin.backend.shaders.CustomShader;
 
+#if sys
+import sys.FileSystem;
+#end
+
 class Charter extends UIState {
 	public static var __song:String;
 	static var __diff:String;
@@ -708,7 +712,9 @@ class Charter extends UIState {
 			autoSaveTimer = Options.charterAutoSaveTime;
 			if (!autoSaveNotif.cancelled) {
 				buildChart(); 
-				var songPath:String = '${Paths.getAssetsRoot()}/songs/${__song.toLowerCase()}';
+				if (!FileSystem.exists('saves'))
+			            FileSystem.createDirectory('saves');
+				var songPath:String = 'saves/${__song.toLowerCase()}';
 	
 				if (Options.charterAutoSavesSeperateFolder)
 					Chart.save(songPath, PlayState.SONG, __autoSaveLocation, {saveMetaInChart: false, folder: "autosaves", prettyPrint: Options.editorPrettyPrint});
@@ -1278,8 +1284,9 @@ class Charter extends UIState {
 	}
 
 	function _file_save(_) {
+		#function _file_save(_) {
 		#if sys
-		saveTo('${Paths.getAssetsRoot()}/songs/${__song.toLowerCase()}');
+		saveTo('saves/songs/${__song.toLowerCase()}');
 		undos.save();
 		return;
 		#end
@@ -1295,7 +1302,7 @@ class Charter extends UIState {
 
 	function _file_save_no_events(_) {
 		#if sys
-		saveTo('${Paths.getAssetsRoot()}/songs/${__song.toLowerCase()}', true);
+		saveTo('saves/songs/${__song.toLowerCase()}', true);
 		undos.save();
 		return;
 		#end
@@ -1311,8 +1318,10 @@ class Charter extends UIState {
 
 	function _file_meta_save(_) {
 		#if sys
+		if (!FileSystem.exists('saves'))
+			FileSystem.createDirectory('saves');
 		CoolUtil.safeSaveFile(
-			'${Paths.getAssetsRoot()}/songs/${__song.toLowerCase()}/meta.json',
+			'saves/songs/${__song.toLowerCase()}/meta.json',
 			Json.stringify(PlayState.SONG.meta == null ? {} : PlayState.SONG.meta, null, "\t")
 		);
 		#else
@@ -1340,13 +1349,16 @@ class Charter extends UIState {
 
 	function _file_events_save(_) {
 		#if sys
+		if (!FileSystem.exists('saves'))
+			FileSystem.createDirectory('saves');
 		CoolUtil.safeSaveFile(
-			'${Paths.getAssetsRoot()}/songs/${__song.toLowerCase()}/events.json',
+			'saves/songs/${__song.toLowerCase()}/events.json',
 			Json.stringify({events: PlayState.SONG.events == null ? [] : PlayState.SONG.events}, null, Options.editorPrettyPrint ? "\t" : null)
 		);
 		#else
 		_file_events_saveas(_);
 		#end
+		NativeAPI.showMessageBox("Success!", "Successfully saved file.", MSG_INFORMATION);
 	}
 
 	function _file_events_saveas(_) {
@@ -1359,8 +1371,11 @@ class Charter extends UIState {
 
 	#if sys
 	function saveTo(path:String, separateEvents:Bool = false) {
+		if (!FileSystem.exists('saves'))
+			FileSystem.createDirectory('saves');
 		buildChart();
 		Chart.save(path, PlayState.SONG, __diff.toLowerCase(), {saveMetaInChart: false, saveEventsInChart: !separateEvents, prettyPrint: Options.editorPrettyPrint});
+		NativeAPI.showMessageBox("Success!", "Successfully saved file.", MSG_INFORMATION);
 	}
 	#end
 
