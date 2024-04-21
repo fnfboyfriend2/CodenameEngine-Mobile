@@ -1284,7 +1284,7 @@ class Charter extends UIState {
 	}
 
 	function _file_save(_) {
-		#function _file_save(_) {
+		
 		#if sys
 		saveTo('saves/songs/${__song.toLowerCase()}');
 		undos.save();
