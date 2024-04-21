@@ -21,7 +21,7 @@ void main() {
 		return;
 
 	vec4 color = getColor(camPos);
-	float fsteps = steps;
+	float fsteps = float(steps);
 	for(float inside = 1.0; inside < stepsInside+1.0; inside++) {
 		for(int i = 0; i < steps; i++) {
 			float fi = i;
