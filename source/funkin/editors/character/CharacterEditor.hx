@@ -330,8 +330,10 @@ class CharacterEditor extends UIState {
 
 	function _file_save(_) {
 		#if sys
+		if (!FileSystem.exists('saves'))
+			FileSystem.createDirectory('saves');
 		CoolUtil.safeSaveFile(
-			'data/characters/${character.curCharacter}.xml',
+			'saves/${character.curCharacter}.xml',
 			buildCharacter()
 		);
 		undos.save();
