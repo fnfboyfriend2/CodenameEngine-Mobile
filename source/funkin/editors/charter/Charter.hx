@@ -1150,7 +1150,7 @@ class Charter extends UIState {
 		updateNoteLogic(elapsed);
 		updateAutoSaving(elapsed);
 		
-		if (virtualPad.buttonA.justPressed) _playback_play();
+		if (virtualPad.buttonA.justPressed) _playback_play(_);
 		
 		if (FlxG.sound.music.playing || __firstFrame) {
 			gridBackdrops.conductorSprY = curStepFloat * 40;
