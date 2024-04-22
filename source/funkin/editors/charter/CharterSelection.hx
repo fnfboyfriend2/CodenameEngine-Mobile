@@ -32,9 +32,9 @@ class CharterSelection extends EditorTreeMenu {
 					for(d in s.difficulties) if (d != "")
 						new TextOption(d, "Press ACCEPT to edit the chart for the selected difficulty", function() {
 							FlxG.switchState(new Charter(s.name, d));
+			                                addVirtualPad('UP_DOWN', 'A_B');
+		                                        addVirtualPadCamera(false);
 						})
-			                        addVirtualPad('UP_DOWN', 'A_B');
-		                                addVirtualPadCamera(false);
 				];
 				list.push(new NewOption("New Difficulty", "New Difficulty", function() {
 					FlxG.state.openSubState(new ChartCreationScreen(saveChart));
@@ -125,6 +125,8 @@ class CharterSelection extends EditorTreeMenu {
 				for(d in creation.meta.difficulties)
 					if (d != "") new TextOption(d, "Press ACCEPT to edit the chart for the selected difficulty", function() {
 						FlxG.switchState(new Charter(creation.meta.name, d));
+				                addVirtualPad('UP_DOWN', 'A_B');
+		                                addVirtualPadCamera(false);
 					})
 			];
 			list.push(new NewOption("New Difficulty", "New Difficulty", function() {
