@@ -264,7 +264,7 @@ class CharacterEditor extends UIState {
 
 		DiscordUtil.call("onEditorLoaded", ["Character Editor", __character]);
 
-		addVirtualPad('FULL', '');
+		addVirtualPad('LEFT_FULL', '');
 		addVirtualPadCamera(false);
 	}
 
