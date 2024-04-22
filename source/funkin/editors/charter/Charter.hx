@@ -25,6 +25,9 @@ import funkin.editors.ui.UIState;
 import flixel.util.FlxColor;
 import openfl.display.BitmapData;
 import funkin.backend.shaders.CustomShader;
+#if sys
+import sys.FileSystem;
+#end
 
 class Charter extends UIState {
 	public static var __song:String;
