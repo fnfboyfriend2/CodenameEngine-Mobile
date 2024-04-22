@@ -1150,7 +1150,23 @@ class Charter extends UIState {
 		updateNoteLogic(elapsed);
 		updateAutoSaving(elapsed);
 		
-		if (virtualPad.buttonA.justPressed) _playback_play(_);
+		if (virtualPad.buttonA.pressed) {
+    		if (Conductor.songPosition >= FlxG.sound.music.getDefault(vocals).length - Conductor.songOffset) return;
+    
+    		if (FlxG.sound.music.playing) {
+    			FlxG.sound.music.pause();
+    			vocals.pause();
+    			for (strumLine in strumLines.members) strumLine.vocals.pause();
+    		} else {
+    			FlxG.sound.music.play();
+    			vocals.play();
+    			vocals.time = FlxG.sound.music.time = Conductor.songPosition + Conductor.songOffset * 2;
+    			for (strumLine in strumLines.members) {
+    				strumLine.vocals.play();
+    				strumLine.vocals.time = vocals.time;
+    			}
+    		}
+		}
 		
 		if (FlxG.sound.music.playing || __firstFrame) {
 			gridBackdrops.conductorSprY = curStepFloat * 40;
