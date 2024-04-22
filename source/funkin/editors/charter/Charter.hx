@@ -26,10 +26,6 @@ import flixel.util.FlxColor;
 import openfl.display.BitmapData;
 import funkin.backend.shaders.CustomShader;
 
-#if sys
-import sys.FileSystem;
-#end
-
 class Charter extends UIState {
 	public static var __song:String;
 	static var __diff:String;
@@ -516,6 +512,9 @@ class Charter extends UIState {
 		dataDisplay.cameras = [charterCamera]; dataDisplay.x = -dataDisplay.width; add(dataDisplay);*/
 
 		DiscordUtil.call("onEditorLoaded", ["Chart Editor", __song + " (" + __diff + ")"]);
+		
+		addVirtualPad('UP_DOWN', 'A_B_C');
+		addVirtualPadCamera(false);
 	}
 
 	override function destroy() {
@@ -675,8 +674,8 @@ class Charter extends UIState {
 
 	public function updateSelectionLogic() {
 		function select(s:ICharterSelectable) {
-			if (FlxG.keys.pressed.CONTROL) selection.push(s);
-			else if (FlxG.keys.pressed.SHIFT) selection.remove(s);
+			if (virtualPad.buttonC.pressed) selection.push(s);
+			else if (virtualPad.buttonB.pressed) selection.remove(s);
 			else selection = [s];
 		}
 
@@ -712,9 +711,7 @@ class Charter extends UIState {
 			autoSaveTimer = Options.charterAutoSaveTime;
 			if (!autoSaveNotif.cancelled) {
 				buildChart(); 
-				if (!FileSystem.exists('saves'))
-			            FileSystem.createDirectory('saves');
-				var songPath:String = 'saves/${__song.toLowerCase()}';
+				var songPath:String = 'saves/songs/${__song.toLowerCase()}';
 	
 				if (Options.charterAutoSavesSeperateFolder)
 					Chart.save(songPath, PlayState.SONG, __autoSaveLocation, {saveMetaInChart: false, folder: "autosaves", prettyPrint: Options.editorPrettyPrint});
@@ -747,12 +744,12 @@ class Charter extends UIState {
 						selectionBox.bWidth = Std.int(Math.abs(mousePos.x - dragStartPos.x));
 						selectionBox.bHeight = Std.int(Math.abs(mousePos.y - dragStartPos.y));
 					} else {
-						if (FlxG.keys.pressed.SHIFT) {
+						if (virtualPad.buttonB.pressed) {
 							for (group in [notesGroup, eventsGroup])
 								for(n in cast(group, FlxTypedGroup<Dynamic>))
 									if (n.handleSelection(selectionBox) && selection.contains(n))
 										selection.remove(n);
-						} else if (FlxG.keys.pressed.CONTROL) {
+						} else if (virtualPad.buttonC.pressed) {
 							for (group in [notesGroup, eventsGroup])
 								for(n in cast(group, FlxTypedGroup<Dynamic>))
 									if (n.handleSelection(selectionBox) && !selection.contains(n))
@@ -798,7 +795,7 @@ class Charter extends UIState {
 					for (s in selection) {
 						if (s.draggable) {
 							var changePoint:FlxPoint = FlxPoint.get(verticalChange, horizontalChange);
-							if (!FlxG.keys.pressed.SHIFT)
+							if (!virtualPad.buttonB.pressed)
 								changePoint.x -= ((s.step + verticalChange) - quantStepRounded(s.step+verticalChange, verticalChange > 0 ? 0.35 : 0.65));
 
 							var boundedChange:FlxPoint = changePoint.clone();
@@ -852,7 +849,7 @@ class Charter extends UIState {
 							if (mouseOnGrid && mousePos.y > 0 && mousePos.y < (__endStep)*40) {
 								var note = new CharterNote();
 								note.updatePos(
-									FlxMath.bound(FlxG.keys.pressed.SHIFT ? ((mousePos.y-20) / 40) : quantStep(mousePos.y/40), 0, __endStep-1),
+									FlxMath.bound(virtualPad.buttonB.pressed ? ((mousePos.y-20) / 40) : quantStep(mousePos.y/40), 0, __endStep-1),
 									id % 4, 0, noteType, strumLines.members[Std.int(id/4)]
 								);
 								notesGroup.add(note);
@@ -883,12 +880,12 @@ class Charter extends UIState {
 				if (selectionDragging) {
 					currentCursor = BUTTON;
 					selection.loop(function (n:CharterNote) {
-						var change:Float = Math.max((mousePos.y-(FlxG.keys.pressed.SHIFT ? dragStartPos.y : quantStep(dragStartPos.y))) / 40, -n.susLength);
+						var change:Float = Math.max((mousePos.y-(virtualPad.buttonB.pressed ? dragStartPos.y : quantStep(dragStartPos.y))) / 40, -n.susLength);
 						n.tempSusLength = change;
 
-						if (!FlxG.keys.pressed.SHIFT)
+						if (!virtualPad.buttonB.pressed)
 							n.tempSusLength -= (n.susLength + change) - quantStepRounded(n.susLength + change, change > 0 ? 0.35 : 0.65);
-						@:privateAccess n.__susInstaLerp = FlxG.keys.pressed.SHIFT;
+						@:privateAccess n.__susInstaLerp = virtualPad.buttonB.pressed;
 					});
 				} else {
 					var undoChanges:Array<NoteSustainChange> = [];
@@ -941,7 +938,7 @@ class Charter extends UIState {
 			addEventSpr.sprAlpha = lerp(addEventSpr.sprAlpha, 0.75, 0.25);
 			var event = getHoveredEvent(mousePos.y);
 			if (event != null) addEventSpr.updateEdit(event);
-			else addEventSpr.updatePos(FlxG.keys.pressed.SHIFT ? ((mousePos.y) / 40) : quantStepRounded(mousePos.y/40));
+			else addEventSpr.updatePos(virtualPad.buttonB.pressed ? ((mousePos.y) / 40) : quantStepRounded(mousePos.y/40));
 		} else  addEventSpr.sprAlpha = lerp(addEventSpr.sprAlpha, 0, 0.25);
 
 		noteHoverer.showHoverer = Charter.instance.gridBackdropDummy.hovered;
@@ -1149,7 +1146,9 @@ class Charter extends UIState {
 	public override function update(elapsed:Float) {
 		updateNoteLogic(elapsed);
 		updateAutoSaving(elapsed);
-
+		
+		if (virtualPad.buttonA.pressed) _playback_play();
+		
 		if (FlxG.sound.music.playing || __firstFrame) {
 			gridBackdrops.conductorSprY = curStepFloat * 40;
 		} else {
@@ -1207,7 +1206,7 @@ class Charter extends UIState {
 			if(FlxG.keys.justPressed.ANY && !strumLines.isDragging && this.currentFocus == null)
 				UIUtil.processShortcuts(topMenu);
 
-			if (FlxG.keys.pressed.CONTROL) {
+			if (virtualPad.buttonC.pressed) {
 				if (FlxG.mouse.wheel != 0) {
 					zoom += 0.25 * FlxG.mouse.wheel;
 					__camZoom = Math.pow(2, zoom);
@@ -1284,7 +1283,6 @@ class Charter extends UIState {
 	}
 
 	function _file_save(_) {
-		
 		#if sys
 		saveTo('saves/songs/${__song.toLowerCase()}');
 		undos.save();
