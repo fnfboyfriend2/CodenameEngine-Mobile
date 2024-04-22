@@ -33,6 +33,8 @@ class CharterSelection extends EditorTreeMenu {
 						new TextOption(d, "Press ACCEPT to edit the chart for the selected difficulty", function() {
 							FlxG.switchState(new Charter(s.name, d));
 						})
+			                        addVirtualPad('UP_DOWN', 'A_B');
+		                                addVirtualPadCamera(false);
 				];
 				list.push(new NewOption("New Difficulty", "New Difficulty", function() {
 					FlxG.state.openSubState(new ChartCreationScreen(saveChart));
